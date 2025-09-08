@@ -16,14 +16,17 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_API_KEY_HERE"/>
+            android:value="AIzaSyDgicAfFZTQr8fiEC7_5YfCHVqUY2bidUs"/>
 
-        <activity android:name="com.peoples.lifesaver.main.MainActivity"
+        <activity android:name="com.peoples.lifesaver.main.LandingActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+        </activity>
+        <activity android:name="com.peoples.lifesaver.main.MainActivity"
+            android:exported="true">
         </activity>
 
         <receiver android:name="com.peoples.lifesaver.risk.RiskGeofenceReceiver"

@@ -61,6 +61,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (mapFragment != null) mapFragment.getMapAsync(this);
 
         geofencingClient = LocationServices.getGeofencingClient(this);
+
+        findViewById(R.id.btn_disconnect).setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, LandingActivity.class);
+            startActivity(intent);
+            finish();
+        });
     }
 
     @Override
@@ -91,7 +97,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public void onResponse(Call<List<RiskZone>> call, Response<List<RiskZone>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     applyZones(response.body());
-                } else {
+                }
+                else {
                     // Fallback to bundled asset
                     applyZones(loadZonesFromAssets());
                 }
@@ -134,8 +141,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         HeatmapTileProvider provider = new HeatmapTileProvider.Builder()
-                .data(points).build();
+                .data(points)
+                .radius(50)
+                .build();
         map.addTileOverlay(new TileOverlayOptions().tileProvider(provider));
+
+        if (!zones.isEmpty()) {
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(zones.get(0).getLat(), zones.get(0).getLng()), 14f));
+        }
     }
 
     private void addRiskGeofence(LatLng center, float radius) {

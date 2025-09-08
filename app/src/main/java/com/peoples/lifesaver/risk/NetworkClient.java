@@ -5,7 +5,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NetworkClient {
     // Demo server folder (CHANGE to your GitHub raw URL)
-    private static final String BASE_URL = "https://raw.githubusercontent.com/yourusername/riskdata/main/";
+    private static final String BASE_URL = "https://raw.githubusercontent.com/javaspecial/riskdata/refs/heads/main/";
     private static Retrofit retrofit;
 
     public static ApiService api() {
