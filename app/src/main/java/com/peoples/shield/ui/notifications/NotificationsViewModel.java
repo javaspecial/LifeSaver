@@ -1,4 +1,4 @@
-package com.peoples.lifesaver.ui.notifications;
+package com.peoples.shield.ui.notifications;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

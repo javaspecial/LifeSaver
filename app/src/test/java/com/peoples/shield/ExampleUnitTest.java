@@ -1,4 +1,4 @@
-package com.peoples.lifesaver;
+package com.peoples.shield;
 
 import org.junit.Test;
 

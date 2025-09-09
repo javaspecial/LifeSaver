@@ -1,4 +1,4 @@
-package com.peoples.lifesaver.main;
+package com.peoples.shield.main;
 
 import android.Manifest;
 import android.app.PendingIntent;
@@ -22,10 +22,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
-import com.peoples.lifesaver.R;
-import com.peoples.lifesaver.risk.NetworkClient;
-import com.peoples.lifesaver.risk.RiskGeofenceReceiver;
-import com.peoples.lifesaver.risk.RiskZone;
+import com.peoples.shield.R;
+import com.peoples.shield.risk.NetworkClient;
+import com.peoples.shield.risk.RiskGeofenceReceiver;
+import com.peoples.shield.risk.RiskZone;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(com.peoples.lifesaver.R.id.map);
+                .findFragmentById(com.peoples.shield.R.id.map);
         if (mapFragment != null) mapFragment.getMapAsync(this);
 
         geofencingClient = LocationServices.getGeofencingClient(this);

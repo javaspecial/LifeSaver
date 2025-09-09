@@ -1,4 +1,4 @@
-package com.peoples.lifesaver.risk;
+package com.peoples.shield.risk;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

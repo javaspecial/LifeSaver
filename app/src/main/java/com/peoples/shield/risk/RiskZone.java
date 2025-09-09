@@ -1,4 +1,4 @@
-package com.peoples.lifesaver.risk;
+package com.peoples.shield.risk;
 
 public class RiskZone {
     public double getLat() {

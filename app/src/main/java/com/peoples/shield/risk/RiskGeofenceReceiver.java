@@ -1,4 +1,4 @@
-package com.peoples.lifesaver.risk;
+package com.peoples.shield.risk;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

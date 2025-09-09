@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.peoples.lifesaver.main.MainActivity">
+    tools:context="com.peoples.shield.main.MainActivity">
 
     <fragment
         android:id="@+id/map"
@@ -13,11 +13,16 @@
 
     <Button
         android:id="@+id/btn_disconnect"
-        android:layout_width="wrap_content"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:text="Disconnect"
-        android:layout_margin="16dp"
-        android:backgroundTint="@android:color/holo_red_dark"
+        android:text="DISCONNECT"
+        android:textSize="18sp"
         android:textColor="@android:color/white"
-        android:layout_gravity="bottom|center"/>
+        android:backgroundTint="#FF3B30"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="40dp"
+        android:padding="12dp"
+        android:elevation="6dp"
+        android:stateListAnimator="@null"
+        android:background="@drawable/rounded_button"/>
 </FrameLayout>

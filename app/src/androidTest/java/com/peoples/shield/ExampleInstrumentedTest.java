@@ -1,4 +1,4 @@
-package com.peoples.lifesaver;
+package com.peoples.shield;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.peoples.livesaver", appContext.getPackageName());
+        assertEquals("com.peoples.shield", appContext.getPackageName());
     }
 }

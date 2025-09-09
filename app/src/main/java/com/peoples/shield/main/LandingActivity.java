@@ -1,12 +1,9 @@
-package com.peoples.lifesaver.main;
+package com.peoples.shield.main;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
-
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.peoples.lifesaver.R;
+import com.peoples.shield.R;
 
 public class LandingActivity extends AppCompatActivity {
 

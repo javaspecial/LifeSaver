@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.peoples.lifesaver"
+    namespace = "com.peoples.shield"
     compileSdk = 34
 
     defaultConfig {

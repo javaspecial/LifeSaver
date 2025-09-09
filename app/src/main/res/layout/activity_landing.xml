@@ -1,17 +1,57 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.peoples.lifesaver.main.LandingActivity">
+    android:background="@drawable/landing_gradient">
 
-    <Button
-        android:id="@+id/btn_connect"
+    <!-- App Title -->
+    <TextView
+        android:id="@+id/appTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Connect"
-        android:layout_margin="16dp"
-        android:backgroundTint="@android:color/holo_green_dark"
+        android:text="LifeShield"
+        android:textSize="28sp"
+        android:textStyle="bold"
         android:textColor="@android:color/white"
-        android:layout_gravity="bottom|center"/>
-</FrameLayout>
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"/>
+
+    <!-- Subtitle -->
+    <TextView
+        android:id="@+id/subTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Stay Safe, Stay Alert"
+        android:textSize="18sp"
+        android:textColor="#B3E5FC"
+        android:layout_below="@id/appTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Connect Button -->
+    <Button
+        android:id="@+id/btn_connect"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="CONNECT"
+        android:textSize="18sp"
+        android:textColor="@android:color/white"
+        android:layout_centerInParent="true"
+        android:padding="12dp"
+        android:elevation="6dp"
+        android:stateListAnimator="@null"
+        android:background="@drawable/rounded_button"/>
+
+    <!-- Footer -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="© Powered by LifeShield"
+        android:textSize="16sp"
+        android:textColor="@android:color/white"
+        android:textStyle="italic"
+        android:fontFamily="sans-serif"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"/>
+</RelativeLayout>

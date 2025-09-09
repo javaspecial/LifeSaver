@@ -1,4 +1,4 @@
-package com.peoples.lifesaver.risk;
+package com.peoples.shield.risk;
 
 import android.app.Application;
 import android.app.NotificationChannel;

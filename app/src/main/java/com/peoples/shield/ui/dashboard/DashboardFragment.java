@@ -1,4 +1,4 @@
-package com.peoples.lifesaver.ui.dashboard;
+package com.peoples.shield.ui.dashboard;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.peoples.lifesaver.databinding.FragmentDashboardBinding;
+import com.peoples.shield.databinding.FragmentDashboardBinding;
 
 public class DashboardFragment extends Fragment {
 

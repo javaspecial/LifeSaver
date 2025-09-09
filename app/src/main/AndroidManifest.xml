@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.peoples.lifesaver">
+    package="com.peoples.shield">
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -12,24 +12,25 @@
     <application
         android:allowBackup="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:label="LifeShield">
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDgicAfFZTQr8fiEC7_5YfCHVqUY2bidUs"/>
 
-        <activity android:name="com.peoples.lifesaver.main.LandingActivity"
+        <activity android:name="com.peoples.shield.main.LandingActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.peoples.lifesaver.main.MainActivity"
+        <activity android:name="com.peoples.shield.main.MainActivity"
             android:exported="true">
         </activity>
 
-        <receiver android:name="com.peoples.lifesaver.risk.RiskGeofenceReceiver"
+        <receiver android:name="com.peoples.shield.risk.RiskGeofenceReceiver"
             android:exported="true"/>
     </application>
 </manifest>

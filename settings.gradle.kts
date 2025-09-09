@@ -15,6 +15,6 @@ dependencyResolutionManagement {
 }
 
 
-rootProject.name = "LiveSaver"
+rootProject.name = "LifeShield"
 include(":app")
  
