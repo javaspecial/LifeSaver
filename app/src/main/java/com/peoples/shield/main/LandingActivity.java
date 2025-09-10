@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,18 +21,28 @@ public class LandingActivity extends AppCompatActivity {
 
         Button btnConnect = findViewById(R.id.btn_connect);
         btnConnect.setOnClickListener(v -> {
-            btnConnect.setText("Connecting...");
+            btnConnect.setText("Connecting");
             btnConnect.setEnabled(false);
 
-            Drawable progressDrawable = getResources().getDrawable(R.drawable.ic_spinner);
-            progressDrawable.setBounds(0, 0, 60, 60);
-            btnConnect.setCompoundDrawablesRelative(progressDrawable, null, null, null);
+            // Create a small indeterminate progress spinner
+            ProgressBar progressBar = new ProgressBar(this, null, android.R.attr.progressBarStyleSmallTitle);
+            progressBar.setIndeterminate(true);
 
+            // Force size (30x30dp looks good for a button icon)
+            int size = (int) (30 * getResources().getDisplayMetrics().density);
+            progressBar.setLayoutParams(new ViewGroup.LayoutParams(size, size));
+
+            // Get the drawable of the ProgressBar (the spinning circle)
+            Drawable spinner = progressBar.getIndeterminateDrawable();
+            btnConnect.setCompoundDrawablesRelativeWithIntrinsicBounds(spinner, null, null, null);
+
+            // After 2 sec, remove spinner + go to MainActivity
             new Handler().postDelayed(() -> {
+                btnConnect.setText("Connected");
                 btnConnect.setCompoundDrawablesRelative(null, null, null, null);
                 startActivity(new Intent(LandingActivity.this, MainActivity.class));
                 finish();
-            }, 100);
+            }, 2000);
         });
     }
 }
