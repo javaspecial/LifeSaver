@@ -1,8 +1,8 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.peoples.shield">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.peoples.shield">
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
@@ -17,7 +17,8 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDgicAfFZTQr8fiEC7_5YfCHVqUY2bidUs"/>
+            android:value="AIzaSyDgicAfFZTQr8fiEC7_5YfCHVqUY2bidUs">
+        </meta-data>
 
         <activity android:name="com.peoples.shield.main.LandingActivity"
             android:exported="true">
@@ -31,6 +32,8 @@
         </activity>
 
         <receiver android:name="com.peoples.shield.risk.RiskGeofenceReceiver"
-            android:exported="true"/>
+            android:enabled="true"
+            android:exported="true">
+        </receiver>
     </application>
 </manifest>

@@ -35,6 +35,10 @@ android {
 }
 
 dependencies {
+    // Room (Java)
+    implementation("androidx.room:room-runtime:2.5.2")
+    annotationProcessor("androidx.room:room-compiler:2.5.2")
+
     implementation("androidx.navigation:navigation-fragment:2.7.3")
     implementation("androidx.navigation:navigation-ui:2.7.3")
 
@@ -52,7 +56,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
     // AndroidX + Material
-    implementation("androidx.core:core:1.12.0")   // 👈 use this instead of core-ktx for pure Java
+    implementation("androidx.core:core:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
 

@@ -11,6 +11,8 @@ import android.widget.ProgressBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.peoples.shield.R;
+import com.peoples.shield.handler.RegisterEntity;
+import com.peoples.shield.room.AppDatabase;
 
 public class LandingActivity extends AppCompatActivity {
 
@@ -18,6 +20,8 @@ public class LandingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
+
+        RegisterEntity.doRegisterEntity(AppDatabase.getInstance(this));
 
         Button btnConnect = findViewById(R.id.btn_connect);
         btnConnect.setOnClickListener(v -> {

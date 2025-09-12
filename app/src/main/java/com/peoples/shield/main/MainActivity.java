@@ -7,13 +7,18 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,9 +28,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.TileOverlayOptions;
 import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.peoples.shield.R;
+import com.peoples.shield.entity.CurrentLocation;
+import com.peoples.shield.entity.RiskZone;
+import com.peoples.shield.handler.DbOperation;
+import com.peoples.shield.handler.DbService;
 import com.peoples.shield.risk.NetworkClient;
 import com.peoples.shield.risk.RiskGeofenceReceiver;
-import com.peoples.shield.risk.RiskZone;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,9 +47,12 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+    private final DbService dbService = new DbService();
 
     private GoogleMap map;
     private GeofencingClient geofencingClient;
+    private FusedLocationProviderClient fusedLocationClient;
+    private static final int LOCATION_PERMISSION_REQUEST = 101;
     private final List<PendingIntent> geofenceIntents = new ArrayList<>();
 
     @Override
@@ -72,26 +83,60 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
-        ensureLocationPermission();
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        LatLng center = new LatLng(23.7806, 90.4070);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(center, 13f));
+        this.checkLocationPermission();
 
-        // First attempt: fetch from demo server
-        fetchZonesFromServer();
+        this.loadCurrentLocation();
+
+        this.loadZonesFromGithub();
     }
 
-    private void ensureLocationPermission() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        } else {
+    private void checkLocationPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, 2);
+        }
+        else {
             map.setMyLocationEnabled(true);
         }
     }
 
-    private void fetchZonesFromServer() {
+    private void loadCurrentLocation() {
+        LocationRequest request = LocationRequest.create();
+        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        request.setInterval(2000); // 2 seconds
+        request.setFastestInterval(1000);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        fusedLocationClient.requestLocationUpdates(request, new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult result) {
+                if (result.getLastLocation() != null) {
+                    dbService.queryAsync(CurrentLocation.class, (handler, param) -> handler.getOne(), null, currentLocation -> {
+                        if (currentLocation == null) {
+                            dbService.execute(DbOperation.INSERT, new CurrentLocation(System.currentTimeMillis(), result.getLastLocation().getLongitude(), result.getLastLocation().getLatitude()));
+                        }
+                        else {
+                            currentLocation.lat = result.getLastLocation().getLatitude();
+                            currentLocation.lng = result.getLastLocation().getLongitude();
+                            currentLocation.timeStamp = System.currentTimeMillis();
+                            dbService.execute(DbOperation.UPDATE, currentLocation);
+                        }
+                    });
+
+                    fusedLocationClient.removeLocationUpdates(this);
+                }
+            }
+        }, getMainLooper());
+    }
+
+    private void loadZonesFromGithub() {
         NetworkClient.api().getRiskZones().enqueue(new Callback<List<RiskZone>>() {
             @Override
             public void onResponse(Call<List<RiskZone>> call, Response<List<RiskZone>> response) {
@@ -131,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void applyZones(List<RiskZone> zones) {
-        clearGeofences();
+        this.clearGeofences();
 
         List<LatLng> points = new ArrayList<>();
         for (RiskZone zone : zones) {
@@ -172,7 +217,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         geofencingClient.addGeofences(request, pi);
         geofenceIntents.add(pi);
     }
-
     private void clearGeofences() {
         for (PendingIntent pi : geofenceIntents) {
             geofencingClient.removeGeofences(pi);
