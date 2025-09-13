@@ -25,6 +25,8 @@ public interface CurrentLocationDao {
     @Query("SELECT * FROM current_location LIMIT 1")
     CurrentLocation getOne();
 
+    @Query("SELECT * FROM current_location WHERE id = :id LIMIT 1")
+    CurrentLocation getOneById(Long id);
     @Query(("SELECT * FROM current_location"))
     List<CurrentLocation> getAll();
 }

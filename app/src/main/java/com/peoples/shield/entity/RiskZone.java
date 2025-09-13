@@ -14,11 +14,10 @@ public class RiskZone {
 
     public RiskZone() {}
 
-    public RiskZone(Float radius, Double lng, Double lat, Long id) {
+    public RiskZone(Double lat, Double lng, Float radius) {
         this.radius = radius;
         this.lng = lng;
         this.lat = lat;
-        this.id = id;
     }
 
     public long getId() {

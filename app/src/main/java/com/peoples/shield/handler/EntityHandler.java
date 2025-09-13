@@ -8,4 +8,5 @@ public interface EntityHandler<T> {
     void delete(T entity);
     List<T> getAll();
     T getOne();
+    T getOneById(Long id);
 }

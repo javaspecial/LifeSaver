@@ -25,7 +25,7 @@ public class LandingActivity extends AppCompatActivity {
 
         Button btnConnect = findViewById(R.id.btn_connect);
         btnConnect.setOnClickListener(v -> {
-            btnConnect.setText("Connecting");
+            btnConnect.setText("CONNECTING");
             btnConnect.setEnabled(false);
 
             // Create a small indeterminate progress spinner
@@ -42,7 +42,7 @@ public class LandingActivity extends AppCompatActivity {
 
             // After 2 sec, remove spinner + go to MainActivity
             new Handler().postDelayed(() -> {
-                btnConnect.setText("Connected");
+                btnConnect.setText("CONNECTED");
                 btnConnect.setCompoundDrawablesRelative(null, null, null, null);
                 startActivity(new Intent(LandingActivity.this, MainActivity.class));
                 finish();

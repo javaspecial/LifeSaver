@@ -32,6 +32,11 @@ public class CurrentLocationHandler implements EntityHandler<CurrentLocation> {
     }
 
     @Override
+    public CurrentLocation getOneById(Long id) {
+        return dao.getOneById(id);
+    }
+
+    @Override
     public List<CurrentLocation> getAll() {
         return dao.getAll();
     }

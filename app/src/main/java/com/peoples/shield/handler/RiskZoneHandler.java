@@ -32,6 +32,11 @@ public class RiskZoneHandler implements EntityHandler<RiskZone> {
     }
 
     @Override
+    public RiskZone getOneById(Long id) {
+        return dao.getOneById(id);
+    }
+
+    @Override
     public List<RiskZone> getAll() {
         return dao.getAll();
     }

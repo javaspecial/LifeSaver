@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -50,28 +53,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final DbService dbService = new DbService();
 
     private GoogleMap map;
+    private ProgressBar progressBar;
     private GeofencingClient geofencingClient;
     private FusedLocationProviderClient fusedLocationClient;
-    private static final int LOCATION_PERMISSION_REQUEST = 101;
     private final List<PendingIntent> geofenceIntents = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        this.setContentView(R.layout.activity_main);
+
+        progressBar = findViewById(R.id.progressBar);
 
         if (Build.VERSION.SDK_INT >= 33) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-                    != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 100);
             }
         }
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(com.peoples.shield.R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) mapFragment.getMapAsync(this);
 
-        geofencingClient = LocationServices.getGeofencingClient(this);
+        this.geofencingClient = LocationServices.getGeofencingClient(this);
 
         findViewById(R.id.btn_disconnect).setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, LandingActivity.class);
@@ -82,15 +85,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        map = googleMap;
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        this.map = googleMap;
+        this.fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        this.checkLocationPermission();
+        if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
 
-        this.loadCurrentLocation();
+        dbService.getOneAsync(CurrentLocation.class, currentLocation -> {
+            if (progressBar != null) runOnUiThread(() -> progressBar.setVisibility(View.GONE));
 
-        this.loadZonesFromGithub();
+            if (currentLocation != null && map != null) {
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.lat, currentLocation.lng), 15f));
+            }
+
+            this.checkLocationPermission();
+            this.loadCurrentLocationAndRiskZones();
+        });
     }
+
 
     private void checkLocationPermission() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -104,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    private void loadCurrentLocation() {
+    private void loadCurrentLocationAndRiskZones() {
         LocationRequest request = LocationRequest.create();
         request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         request.setInterval(2000); // 2 seconds
@@ -118,9 +129,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onLocationResult(@NonNull LocationResult result) {
                 if (result.getLastLocation() != null) {
-                    dbService.queryAsync(CurrentLocation.class, (handler, param) -> handler.getOne(), null, currentLocation -> {
+                    dbService.getOneAsync(CurrentLocation.class, currentLocation -> {
                         if (currentLocation == null) {
-                            dbService.execute(DbOperation.INSERT, new CurrentLocation(System.currentTimeMillis(), result.getLastLocation().getLongitude(), result.getLastLocation().getLatitude()));
+                            currentLocation = new CurrentLocation(System.currentTimeMillis(), result.getLastLocation().getLongitude(), result.getLastLocation().getLatitude());
+                            dbService.execute(DbOperation.INSERT, currentLocation);
                         }
                         else {
                             currentLocation.lat = result.getLastLocation().getLatitude();
@@ -128,6 +140,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             currentLocation.timeStamp = System.currentTimeMillis();
                             dbService.execute(DbOperation.UPDATE, currentLocation);
                         }
+
+                        RiskZone myZone = new RiskZone(currentLocation.lat, currentLocation.lng,100F);
+                        List<RiskZone> currentZones = new ArrayList<>();
+                        currentZones.add(myZone);
+                        loadZonesFromGithub(currentZones);
+
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLocation.lat, currentLocation.lng), 15f));
                     });
 
                     fusedLocationClient.removeLocationUpdates(this);
@@ -136,22 +155,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }, getMainLooper());
     }
 
-    private void loadZonesFromGithub() {
+    private void loadZonesFromGithub(List<RiskZone> currentZones) {
         NetworkClient.api().getRiskZones().enqueue(new Callback<List<RiskZone>>() {
             @Override
             public void onResponse(Call<List<RiskZone>> call, Response<List<RiskZone>> response) {
+                List<RiskZone> zones = new ArrayList<>(currentZones);
                 if (response.isSuccessful() && response.body() != null) {
-                    applyZones(response.body());
+                    zones.addAll(response.body());
                 }
                 else {
-                    // Fallback to bundled asset
-                    applyZones(loadZonesFromAssets());
+                    zones.addAll(loadZonesFromAssets());
                 }
+                applyZones(zones);
             }
 
             @Override
             public void onFailure(Call<List<RiskZone>> call, Throwable t) {
-                applyZones(loadZonesFromAssets());
+                Log.e("On fetch map data from server", t.getMessage());
+                List<RiskZone> zones = new ArrayList<>(currentZones);
+                zones.addAll(loadZonesFromAssets());
+                applyZones(zones);
             }
         });
     }
@@ -176,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void applyZones(List<RiskZone> zones) {
-        this.clearGeofences();
+        this.clearGeoFences();
 
         List<LatLng> points = new ArrayList<>();
         for (RiskZone zone : zones) {
@@ -190,15 +213,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .radius(50)
                 .build();
         map.addTileOverlay(new TileOverlayOptions().tileProvider(provider));
-
-        if (!zones.isEmpty()) {
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(zones.get(0).getLat(), zones.get(0).getLng()), 14f));
-        }
     }
 
     private void addRiskGeofence(LatLng center, float radius) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) return;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) return;
 
         Geofence geofence = new Geofence.Builder()
                 .setRequestId("risk_" + center.latitude + "_" + center.longitude)
@@ -207,21 +225,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
                 .build();
 
-        GeofencingRequest request = new GeofencingRequest.Builder()
-                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-                .addGeofence(geofence).build();
+        GeofencingRequest request = new GeofencingRequest.Builder().setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER).addGeofence(geofence).build();
 
         Intent intent = new Intent(this, RiskGeofenceReceiver.class);
-        PendingIntent pi = PendingIntent.getBroadcast(this, (int) System.currentTimeMillis(), intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-        geofencingClient.addGeofences(request, pi);
-        geofenceIntents.add(pi);
+        PendingIntent pi = PendingIntent.getBroadcast(this, (int) System.currentTimeMillis(), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        this.geofencingClient.addGeofences(request, pi);
+        this.geofenceIntents.add(pi);
     }
-    private void clearGeofences() {
-        for (PendingIntent pi : geofenceIntents) {
-            geofencingClient.removeGeofences(pi);
+    private void clearGeoFences() {
+        for (PendingIntent pi : this.geofenceIntents) {
+            this.geofencingClient.removeGeofences(pi);
         }
-        geofenceIntents.clear();
-        map.clear();
+        this.geofenceIntents.clear();
+        this.map.clear();
     }
 }
