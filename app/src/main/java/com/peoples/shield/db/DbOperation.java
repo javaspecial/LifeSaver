@@ -1,4 +1,4 @@
-package com.peoples.shield.handler;
+package com.peoples.shield.db;
 
 public enum DbOperation {
     INSERT,

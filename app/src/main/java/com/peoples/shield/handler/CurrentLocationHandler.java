@@ -5,7 +5,7 @@ import com.peoples.shield.entity.CurrentLocation;
 
 import java.util.List;
 
-public class CurrentLocationHandler implements EntityHandler<CurrentLocation> {
+public class CurrentLocationHandler extends BaseEntityHandler<CurrentLocation> {
     private final CurrentLocationDao dao;
     public CurrentLocationHandler(CurrentLocationDao dao) {
         this.dao = dao;

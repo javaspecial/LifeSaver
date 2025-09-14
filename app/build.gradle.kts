@@ -7,7 +7,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.peoples.lifesaver"
+        applicationId = "com.peoples.shield"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.peoples.shield.room;
+package com.peoples.shield.db;
 
 import android.content.Context;
 
@@ -12,13 +12,13 @@ import com.peoples.shield.entity.CurrentLocation;
 import com.peoples.shield.entity.RiskZone;
 
 @Database(entities = {CurrentLocation.class, RiskZone.class}, version = 1, exportSchema = false)
-public abstract class AppDatabase extends RoomDatabase {
-    private static volatile AppDatabase instance;
+public abstract class DbRoom extends RoomDatabase {
+    private static volatile DbRoom instance;
     public abstract RiskZoneDao riskZoneDao();
     public abstract CurrentLocationDao currentLocationDao();
-    public static synchronized AppDatabase getInstance(Context context) {
+    public static synchronized DbRoom getInstance(Context context) {
         if (instance == null) {
-            instance = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "risk_zone_db").fallbackToDestructiveMigration().build();
+            instance = Room.databaseBuilder(context.getApplicationContext(), DbRoom.class, "risk_zone_db").fallbackToDestructiveMigration().build();
         }
         return instance;
     }

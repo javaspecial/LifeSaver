@@ -5,7 +5,7 @@ import com.peoples.shield.entity.RiskZone;
 
 import java.util.List;
 
-public class RiskZoneHandler implements EntityHandler<RiskZone> {
+public class RiskZoneHandler extends BaseEntityHandler<RiskZone> {
     private final RiskZoneDao dao;
     public RiskZoneHandler(RiskZoneDao dao) {
         this.dao = dao;

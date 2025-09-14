@@ -33,8 +33,8 @@ import com.google.maps.android.heatmaps.HeatmapTileProvider;
 import com.peoples.shield.R;
 import com.peoples.shield.entity.CurrentLocation;
 import com.peoples.shield.entity.RiskZone;
-import com.peoples.shield.handler.DbOperation;
-import com.peoples.shield.handler.DbService;
+import com.peoples.shield.db.DbOperation;
+import com.peoples.shield.db.DbService;
 import com.peoples.shield.risk.NetworkClient;
 import com.peoples.shield.risk.RiskGeofenceReceiver;
 
@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
 
-        dbService.getOneAsync(CurrentLocation.class, currentLocation -> {
+        dbService.getOne(CurrentLocation.class, currentLocation -> {
             if (progressBar != null) runOnUiThread(() -> progressBar.setVisibility(View.GONE));
 
             if (currentLocation != null && map != null) {
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onLocationResult(@NonNull LocationResult result) {
                 if (result.getLastLocation() != null) {
-                    dbService.getOneAsync(CurrentLocation.class, currentLocation -> {
+                    dbService.getOne(CurrentLocation.class, currentLocation -> {
                         if (currentLocation == null) {
                             currentLocation = new CurrentLocation(System.currentTimeMillis(), result.getLastLocation().getLongitude(), result.getLastLocation().getLatitude());
                             dbService.execute(DbOperation.INSERT, currentLocation);
